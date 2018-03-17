@@ -1,26 +1,36 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { fetchUsers } from "./../actions";
+import { Link } from "react-router-dom";
+import { fetchUsers, clearData } from "./../actions";
 
 class UsersListPage extends Component {
   componentDidMount() {
-    this.props.fetchUsers();
+    const { loaded, fetchUsers } = this.props;
+    if (!loaded) {
+      this.props.fetchUsers();
+    }
+  }
+  componentWillUnmount() {
+    this.props.clearData();
   }
   renderUsers() {
-    return this.props.users.map(user => <li key={user.id}>{user.name}</li>);
+    return this.props.usersList.map(user => <li key={user.id}>{user.name}</li>);
   }
   render() {
     return (
       <div>
+        <Link to="/">Back to home</Link>
+        <br />
         Here is a big list of users <ul>{this.renderUsers()}</ul>
       </div>
     );
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = ({ users: { usersList, loaded } }) => {
   return {
-    users: state.users
+    usersList,
+    loaded
   };
 };
 
@@ -30,5 +40,5 @@ const loadData = store => {
 
 export default {
   loadData,
-  component: connect(mapStateToProps, { fetchUsers })(UsersListPage)
+  component: connect(mapStateToProps, { fetchUsers, clearData })(UsersListPage)
 };
